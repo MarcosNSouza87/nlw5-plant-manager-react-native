@@ -5,30 +5,22 @@ import waterdrop from "../assets/waterdrop.png";
 import { Button } from "../components/Button";
 import colors from "../styles/colors";
 import fonts from "../styles/fonts";
-import { useRoute } from "@react-navigation/core";
+import { useNavigation, useRoute } from "@react-navigation/core";
 import DateTimePicker, { Event } from "@react-native-community/datetimepicker";
 import { format, isBefore } from "date-fns";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { PlantProps, savePlant } from "../libs/storage";
 
 interface Params {
-  plant: {
-    id: string;
-    name: string;
-    about: string;
-    water_tips: string;
-    photo: string;
-    environments: string;
-    frequency: {
-      times: number;
-      repeat_every: string;
-    };
-  };
+  plant: PlantProps;
 }
 
 export function PlantSave() {
   const [selectedDateTime, setSelectedDateTime] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(Platform.OS === "ios");
+  const navigation = useNavigation();
   const route = useRoute();
+
   const { plant } = route.params as Params;
 
   function handleChangeTime(event: Event, dateTime: Date | undefined) {
@@ -46,6 +38,26 @@ export function PlantSave() {
 
   function handleOpenDatetimePickerForAndroid() {
     setShowDatePicker((oldState) => !oldState);
+  }
+
+  async function handleSave() {
+    //const data = await loadPlant();
+    try {
+      await savePlant({
+        ...plant,
+        dateTimeNotification: selectedDateTime,
+      });
+      navigation.navigate("Confirmation", {
+        title: "Tudo certo",
+        subtitle:
+          "Fique tranquilo que sempre vamos lembrar você de cuidar da sua plantinha com muito cuidado.",
+        buttonTitle: "Muito Obrigado",
+        icon: "hug",
+        nextScreen: "MyPlants",
+      });
+    } catch {
+      Alert.alert("Não foi possivel salvar.");
+    }
   }
   return (
     <View style={styles.container}>
@@ -83,7 +95,7 @@ export function PlantSave() {
           </TouchableOpacity>
         )}
 
-        <Button title="Cadastrar planta" onPress={() => {}} />
+        <Button title="Cadastrar planta" onPress={handleSave} />
       </View>
     </View>
   );

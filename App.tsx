@@ -20,5 +20,7 @@ export default function App() {
   return <Routes />;
 }
 /*
- start server json-server ./src/services/server.json --host 192.168.56.1 --port 3333
+comando para start do server local:
+json-server ./src/services/server.json --host 192.168.56.1 --port 3333
+
 */
